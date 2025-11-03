@@ -13,9 +13,8 @@ class Api extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Api",
-      home: ProductScreen(),
+    return MaterialApp(title: "Api",
+      onGenerateRoute: (settings) => onGenerateRoute(settings),
     );
   }
 }

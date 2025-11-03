@@ -22,29 +22,30 @@ class ProductModel {
   List<String>? images;
   String? thumbnail;
 
-  ProductModel(
-      {this.id,
-        this.title,
-        this.description,
-        this.category,
-        this.price,
-        this.discountPercentage,
-        this.rating,
-        this.stock,
-        this.tags,
-        this.brand,
-        this.sku,
-        this.weight,
-        this.dimensions,
-        this.warrantyInformation,
-        this.shippingInformation,
-        this.availabilityStatus,
-        this.reviews,
-        this.returnPolicy,
-        this.minimumOrderQuantity,
-        this.meta,
-        this.images,
-        this.thumbnail});
+  ProductModel({
+    this.id,
+    this.title,
+    this.description,
+    this.category,
+    this.price,
+    this.discountPercentage,
+    this.rating,
+    this.stock,
+    this.tags,
+    this.brand,
+    this.sku,
+    this.weight,
+    this.dimensions,
+    this.warrantyInformation,
+    this.shippingInformation,
+    this.availabilityStatus,
+    this.reviews,
+    this.returnPolicy,
+    this.minimumOrderQuantity,
+    this.meta,
+    this.images,
+    this.thumbnail,
+  });
 
   ProductModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -141,12 +142,13 @@ class Reviews {
   String? reviewerName;
   String? reviewerEmail;
 
-  Reviews(
-      {this.rating,
-        this.comment,
-        this.date,
-        this.reviewerName,
-        this.reviewerEmail});
+  Reviews({
+    this.rating,
+    this.comment,
+    this.date,
+    this.reviewerName,
+    this.reviewerEmail,
+  });
 
   Reviews.fromJson(Map<String, dynamic> json) {
     rating = json['rating'];
