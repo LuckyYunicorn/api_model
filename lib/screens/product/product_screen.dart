@@ -1,13 +1,14 @@
 import 'package:api_methods/bloc/product/product_bloc.dart';
 import 'package:api_methods/bloc/product/product_event.dart';
 import 'package:api_methods/bloc/product/product_state.dart';
+import 'package:api_methods/screens/multipart/multipart.dart';
 import 'package:api_methods/screens/posts/post_screen.dart';
 import 'package:api_methods/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProductScreen extends StatefulWidget {
-  static const String routeName = "/";
+  static const String routeName = "/product";
   const ProductScreen({super.key});
 
   @override
@@ -20,7 +21,17 @@ class _ProductScreenState extends State<ProductScreen> {
     return BlocProvider(
       create: (context) => ProductBloc()..add(ProductFetched()),
       child: Scaffold(
-        appBar: AppBar(title: const Text("Product Screen")),
+        appBar: AppBar(
+          title: const Text("Product Screen"),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pushNamed(context, MultipartScreen.routeName);
+              },
+              icon: Icon(Icons.image_outlined),
+            ),
+          ],
+        ),
         body: SafeArea(
           child: BlocBuilder<ProductBloc, ProductState>(
             builder: (context, state) {

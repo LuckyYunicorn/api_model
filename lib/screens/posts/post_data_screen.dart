@@ -31,8 +31,10 @@ class _PostDataScreenState extends State<PostDataScreen> {
       child: BlocListener<PostsBloc, PostsState>(
         listener: (context, state) {
           // TODO: implement listener
-          if(state is PostsUpdated){
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message,)));
+          if (state is PostsUpdated) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(state.message)));
           }
         },
         child: Scaffold(
