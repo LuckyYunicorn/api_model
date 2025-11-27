@@ -39,12 +39,15 @@ class UserDataBloc extends Bloc<UserDataEvent, UserDataState> {
 
   void _searchUser(SearchUser event, Emitter<UserDataState> emit) {
     try {
-      if (event.query != null) {
-        List<UserDataModel> filteredList = state.userDataList
-            .where((element) => element.name == event.query)
-            .toList();
-        emit(state.copyWith(userDataTempList: filteredList));
-      }
+      List<UserDataModel> filteredList = state.userDataList
+          .where(
+            (element) => element.name!.toLowerCase().contains(
+              event.query!.toLowerCase(),
+            ),
+          )
+          .toList();
+
+      emit(state.copyWith(userDataTempList: filteredList));
     } catch (e) {
       print(e);
     }

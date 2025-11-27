@@ -43,6 +43,15 @@ dependencies:
   path_provider: ^2.1.5
   permission_handler: ^12.0.1
   auto_size_text: ^3.0.0
+  geolocator: ^14.0.2
+  geocoding: ^4.0.0
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
+  simple_text_widget_pradeep: ^0.0.1
+  smooth_page_indicator: ^1.2.1
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:
@@ -67,8 +76,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+      - assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

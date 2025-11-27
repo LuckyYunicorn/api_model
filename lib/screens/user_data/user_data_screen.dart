@@ -1,76 +1,132 @@
 import 'package:api_methods/bloc/theme/theme_bloc.dart';
+
 import 'package:api_methods/bloc/theme/theme_event.dart';
-import 'package:api_methods/bloc/user/user_bloc.dart';
-import 'package:api_methods/bloc/user/user_bloc.dart';
-import 'package:api_methods/bloc/user/user_event.dart';
+
 import 'package:api_methods/bloc/user_data/user_data_bloc.dart';
+
 import 'package:api_methods/bloc/user_data/user_data_event.dart';
+
 import 'package:api_methods/bloc/user_data/user_data_state.dart';
-import 'package:auto_size_text/auto_size_text.dart';
+
 import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../bloc/user/user_state.dart';
+class UserDataScreen extends StatefulWidget {
 
-class UserDataScreen extends StatelessWidget {
   const UserDataScreen({super.key});
 
   @override
+
+  State<UserDataScreen> createState() => _UserDataScreenState();
+
+}
+
+class _UserDataScreenState extends State<UserDataScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController animationController;
+
+  @override
+  void initState() {
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..forward();
+  }
+
+  @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
+  // 🔹 Slide Animation (staggered from right)
+  Animation<Offset> buildSlide(int index) {
+    double start = (index * 0.1).clamp(0.0, 0.8); // prevent >1.0
+    double end = (start + 0.5).clamp(0.0, 1.0);   // each item animates for 0.5
+
+    return Tween<Offset>(
+      begin: const Offset(1.0, 0), // slide from right
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: animationController,
+        curve: Interval(start, end, curve: Curves.easeOut),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final themeState = context.watch<ThemeBloc>().state;
-    final isDark = themeState.isDarkMode;
+    final isDark = context.watch<ThemeBloc>().state.isDarkMode;
+
     return BlocProvider(
       create: (context) => UserDataBloc()..add(GetUserData()),
       child: Scaffold(
         appBar: AppBar(
-          title: Text("User Data"),
+          title: const Text("User Data"),
           actions: [
             IconButton(
               onPressed: () {
                 context.read<ThemeBloc>().add(ChangeTheme());
               },
-              icon: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
+              icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
             ),
           ],
         ),
         body: RefreshIndicator(
+          onRefresh: () async {
+            animationController.reset();
+            animationController.forward();
+            context.read<UserDataBloc>().add(GetUserData());
+          },
           child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             child: Column(
               children: [
-                SearchBar(
-                  onChanged: (value) {
-                    context.read<UserDataBloc>().add(SearchUser(query: value));
-                  },
-                ),
-                BlocBuilder<UserBloc, UserState>(
-                  builder: (context, state) {
-                    return (state is UserLoaded)
-                        ? Text(
-                            "${state.user.data?.user?.firstName} ${state.user.data?.user?.lastName}",
-                          )
-                        : AutoSizeText(
-                      'This text will automatically resize to fit the available space.',
-                      style: TextStyle(fontSize: 50), // Initial style
-                      minFontSize: 12,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    );
-                  },
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  child: BlocBuilder<UserDataBloc, UserDataState>(
+                    builder: (context, state) {
+                      return SearchBar(
+                        onChanged: (query) {
+                          context.read<UserDataBloc>()..add(SearchUser(query: query));
+                          animationController.reset();
+                          animationController.forward();
+                        },
+                      );
+                    },
+                  ),
                 ),
                 BlocBuilder<UserDataBloc, UserDataState>(
                   builder: (context, state) {
                     if (state.isLoading) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(
+                          child: SizedBox(
+                              height: 80, child: CircularProgressIndicator()));
                     }
+
+                    final list = state.userDataTempList.isEmpty
+                        ? state.userDataList
+                        : state.userDataTempList;
+
                     return ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
-                      itemCount: state.userDataList.length,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: list.length,
                       itemBuilder: (context, index) {
-                        var data = state.userDataList[index];
-                        return _userTile(
-                          firstName: data.name,
-                          lastName: data.username,
+                        final data = list[index];
+                        final slide = buildSlide(index);
+
+                        // ✅ SlideTransition instead of manual Transform
+                        return SlideTransition(
+                          position: slide,
+                          child: _userTile(
+                            firstName: data.name,
+                            lastName: data.username,
+                          ),
                         );
                       },
                     );
@@ -79,9 +135,6 @@ class UserDataScreen extends StatelessWidget {
               ],
             ),
           ),
-          onRefresh: () async {
-            context.read<UserBloc>()..add(LoadUserEvent());
-          },
         ),
       ),
     );
@@ -93,11 +146,8 @@ Widget _userTile({String? firstName, String? lastName}) {
     leading: CircleAvatar(
       child: Text("${firstName?[0] ?? ""}${lastName?[0] ?? ""}"),
     ),
-    title: Text("${firstName ?? ""}"),
-    subtitle: Text("${lastName ?? ""}"),
-    trailing: Icon(Icons.arrow_forward_ios),
-    onTap: () {
-      print("object");
-    },
+    title: Text(firstName ?? ""),
+    subtitle: Text(lastName ?? ""),
+    trailing: const Icon(Icons.arrow_forward_ios),
   );
 }
